@@ -4,31 +4,35 @@ exports.listar = async function () {
   return await livrosRetiradosRepository.listar();
 };
 
-exports.inserir = async function (livroRetirado) {
-  if (livroRetirado) {
-    return livrosRetiradosRepository.inserir(livroRetirado);
+exports.inserir = async function (idLivro, idUsuario) {
+  if (idLivro && idUsuario) {
+    const verificacao = await livrosRetiradosRepository.verificarLivroRetirado(
+      idLivro
+    );
+    if (!verificacao) {
+      return await livrosRetiradosRepository.inserir(idLivro, idUsuario);
+    } else {
+      throw {
+        status: 'erro',
+        codigo: 409,
+        msg: 'Livro indisponivel para retirada',
+        livro,
+      };
+    }
   } else {
     throw {
       status: 'erro',
       codigo: 400,
-      msg: 'Livro retirado inserido com dados incorretos',livroRetirado
+      msg: 'Erro ao retirar livro',
+      livro,
     };
   }
 };
 
-exports.retirar = async function (id,devolvido) {
-  if (devolvido) {
-    return livrosRetiradosRepository.retirar(id,devolvido);
-  } else {
-    throw {
-      status: 'erro',
-      codigo: 400,
-      msg: 'Livro retirado inserido com dados incorretos',devolvido
-    };
-  }
-};
 exports.buscarPorId = async function (id) {
-  const livroRetiradoEncontrado = await livrosRetiradosRepository.buscarPorId(id);
+  const livroRetiradoEncontrado = await livrosRetiradosRepository.buscarPorId(
+    id
+  );
   if (livroRetiradoEncontrado) return livroRetiradoEncontrado;
   else
     throw {
@@ -39,9 +43,11 @@ exports.buscarPorId = async function (id) {
 };
 
 exports.atualizar = async function (id, atualizacao) {
-  const livroRetiradoEncontrado = await livrosRetiradosRepository.buscarPorId(id);
+  const livroRetiradoEncontrado = await livrosRetiradosRepository.buscarPorId(
+    id
+  );
   if (livroRetiradoEncontrado) {
-    if (atualizacao ) {
+    if (atualizacao) {
       return livrosRetiradosRepository.atualizar(id, atualizacao);
     } else {
       throw {
@@ -59,8 +65,10 @@ exports.atualizar = async function (id, atualizacao) {
 };
 
 exports.deletar = async function (id) {
-  const livroRetiradoEncontrado = await livrosRetiradosRepository.buscarPorId(id);
-  if (livroRetiradoEncontrado) return livrosRetiradosRepository.deletar(id);
+  const livroRetiradoEncontrado = await livrosRetiradosRepository.buscarPorId(
+    id
+  );
+  if (livroRetiradoEncontrado) return livrosRetiradosRepository.devolver(id);
   else
     throw {
       status: 'erro',
@@ -68,4 +76,3 @@ exports.deletar = async function (id) {
       msg: 'Livro retirado com este id não existe',
     };
 };
-

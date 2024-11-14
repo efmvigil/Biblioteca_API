@@ -26,8 +26,7 @@ exports.verificarUsuarioExistente = async function (usuario) {
       'SELECT * FROM usuarios WHERE matricula = $1',
       [usuario.matricula]
     );
-    if (contaExistente.rows.length > 0) return contaExistente.rows[0];
-    else return null;
+    return contaExistente.rows.length > 0 ? contaExistente.rows[0] : null;
   } catch (err) {
     throw {
       status: 'erro',
